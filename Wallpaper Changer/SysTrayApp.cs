@@ -15,19 +15,32 @@ namespace Wallpaper_Changer
 
     public class SysTrayApp : Form
     {
+        // Import the user32.dll to allow the SystemParametersInfo function to change the desktop wallpaper
         [DllImport("user32.dll", EntryPoint = "SystemParametersInfo")]
         public static extern bool SystemParametersInfo(int uiAction, int uiParam, String pvParam, int fWinIni);
 
+        // Parameters needed for the SystemParametersInfo function.
         const int SPI_SETDESKWALLPAPER = 20;
         const int SPIF_UPDATEINIFILE = 0x01;
         const int SPIF_SENDWININICHANGE = 0x02;
+
+        /*
+         * files: List of files to select from when changing the wallpaper.
+         * trayIcon: The image to use on the system tray.
+         * trayMenu: Creates a system tray menu.
+         */
 
         private List<String> files;
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
 
+        // Thread to run the setWallpaper function.
         Thread othread;
 
+        /// <summary>
+        /// Constructor that creates the system tray icon and menu.
+        /// </summary>
+        /// <param name="file">List of strings that contains the files to use when changing the wallpaper</param>
         public SysTrayApp(List<String> file)
         {
             files = new List<string>();
@@ -38,6 +51,7 @@ namespace Wallpaper_Changer
             trayMenu.MenuItems.Add("Exit", OnExit);
             trayMenu.MenuItems.Add("Start", wallpaper);
             trayMenu.MenuItems.Add("Stop", stopWall);
+            trayMenu.MenuItems[2].Enabled = false;
 
             // Create a tray icon. In this example we use a
             // standard system icon for simplicity, but you
@@ -78,10 +92,11 @@ namespace Wallpaper_Changer
 
         private void wallpaper(object sender, EventArgs e)
         {
-            MessageBox.Show(sender.ToString());
+            
             othread = new Thread(new ThreadStart(setWallpaper));
             othread.Start();
             trayMenu.MenuItems[1].Enabled = false;
+            trayMenu.MenuItems[2].Enabled = true;
         }
 
         private void setWallpaper()
@@ -113,6 +128,8 @@ namespace Wallpaper_Changer
         private void stopWallpaper()
         {
             othread.Abort();
+            trayMenu.MenuItems[1].Enabled = true;
+            trayMenu.MenuItems[2].Enabled = false;
         }
 
         protected override void Dispose(bool isDisposing)

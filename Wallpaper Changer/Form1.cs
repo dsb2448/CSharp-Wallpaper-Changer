@@ -12,20 +12,24 @@ namespace Wallpaper_Changer
 {
     public partial class Form1 : Form
     {
+
+        public List<String> file_list = new List<string>();
+
         public Form1()
         {
             InitializeComponent();
-            string line;
-            System.IO.StreamReader file = new System.IO.StreamReader("C:\\Users\\Scott\\Pictures\\Pic.txt");
-
-            while ((line = file.ReadLine()) != null)
-            {
-                posible_items.Items.Add(line);
-            }
 
             if (items_to_use.Items.Count == 0)
             {
                 move_left.Enabled = false;
+            }
+
+            if (posible_items.Items.Count == 0)
+                if (posible_items.Items.Count == 0)
+                    if (posible_items.Items.Count == 0)
+                        if (posible_items.Items.Count == 0)
+            {
+                move_right.Enabled = false;
             }
         }
 
@@ -92,10 +96,38 @@ namespace Wallpaper_Changer
 
         private void load_file_Click(object sender, EventArgs e)
         {
-            String file_location;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                
+                System.IO.Stream file_location = openFileDialog1.OpenFile();
+
+                using (System.IO.StreamReader file_stream = new System.IO.StreamReader(file_location))
+                {
+                    string line;
+                    while ((line = file_stream.ReadLine()) != null)
+                    {
+                        file_list.Add(line);
+                    }
+                }
+            }
+
+            posible_items.Items.Clear();
+           
+            for (int i = 0; i < file_list.Count; i++)
+            {
+                posible_items.Items.Add(file_list[i]);
+            }
+
+            if (posible_items.Items.Count > 0)
+            {
+                move_right.Enabled = true;
+            }
+        }
+
+        private void save_file_Click(object sender, EventArgs e)
+        {
+            if(saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+
             }
         }
     }

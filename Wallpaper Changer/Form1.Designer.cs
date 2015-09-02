@@ -36,6 +36,8 @@
             this.load_file = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.save_file = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -109,11 +111,27 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // save_file
+            // 
+            this.save_file.Location = new System.Drawing.Point(353, 353);
+            this.save_file.Name = "save_file";
+            this.save_file.Size = new System.Drawing.Size(106, 48);
+            this.save_file.TabIndex = 7;
+            this.save_file.Text = "Save File";
+            this.save_file.UseVisualStyleBackColor = true;
+            this.save_file.Click += new System.EventHandler(this.save_file_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "wall";
+            this.saveFileDialog1.Title = "Save Wallpaper Playlist";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(811, 495);
+            this.Controls.Add(this.save_file);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.load_file);
             this.Controls.Add(this.move_left);
@@ -138,6 +156,8 @@
         private System.Windows.Forms.Button load_file;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Button save_file;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 

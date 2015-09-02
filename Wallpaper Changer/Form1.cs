@@ -42,7 +42,7 @@ namespace Wallpaper_Changer
                 files.Add(items_to_use.Items[i].ToString());
             }
 
-            SysTrayApp tray = new SysTrayApp(files);
+            SysTrayApp tray = new SysTrayApp(files, time_select.Value);
             this.Hide();
         }
 

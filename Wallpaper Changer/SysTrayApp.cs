@@ -8,10 +8,11 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
+using System.ComponentModel;
 
 namespace Wallpaper_Changer
-{
-
+{   
+     
 
     public class SysTrayApp : Form
     {
@@ -33,24 +34,27 @@ namespace Wallpaper_Changer
         private List<String> files;
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
+        private int time_interval;
 
         // Thread to run the setWallpaper function.
-        Thread othread;
+        BackgroundWorker bw;
 
         /// <summary>
         /// Constructor that creates the system tray icon and menu.
         /// </summary>
         /// <param name="file">List of strings that contains the files to use when changing the wallpaper</param>
-        public SysTrayApp(List<String> file)
+
+        public SysTrayApp(List<String> file, decimal time)
         {
+            time_interval = (int)(time * 1000);
             files = new List<string>();
             this.files = file;
 
             // Create a simple tray menu with only one item.
             trayMenu = new ContextMenu();
             trayMenu.MenuItems.Add("Exit", OnExit);
-            trayMenu.MenuItems.Add("Start", wallpaper);
-            trayMenu.MenuItems.Add("Stop", stopWall);
+            trayMenu.MenuItems.Add("Start", bw_wallpaper);
+            trayMenu.MenuItems.Add("Stop", bw_stopWallpaper);
             trayMenu.MenuItems[2].Enabled = false;
 
             // Create a tray icon. In this example we use a
@@ -63,71 +67,66 @@ namespace Wallpaper_Changer
             // Add menu to tray icon and show it.
             trayIcon.ContextMenu = trayMenu;
             trayIcon.Visible = true;
-        }
 
-        private void readFiles()
-        {
-            string line;
-            System.IO.StreamReader file = new System.IO.StreamReader("C:\\Users\\Scott\\Pictures\\Pic.txt");
-
-            while ((line = file.ReadLine()) != null)
-            {
-                this.files.Add(line);
-            }
+            bw = new BackgroundWorker();
+            bw.WorkerSupportsCancellation = true;
+            bw.DoWork += new DoWorkEventHandler(setWallpaper);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_stopWallpaper);
         }
 
         protected override void OnLoad(EventArgs e)
         {
             Visible       = false; // Hide form window.
-            ShowInTaskbar = false; // Remove from taskbar.
+            ShowInTaskbar = false; // Remove from task bar.
  
             base.OnLoad(e);
         }
  
         private void OnExit(object sender, EventArgs e)
         {
-            othread.Abort();
+            bw.CancelAsync();
             Application.Exit();
         }
 
-        private void wallpaper(object sender, EventArgs e)
+        private void bw_wallpaper(object sender, EventArgs e)
         {
-            
-            othread = new Thread(new ThreadStart(setWallpaper));
-            othread.Start();
+            bw.RunWorkerAsync();
             trayMenu.MenuItems[1].Enabled = false;
             trayMenu.MenuItems[2].Enabled = true;
         }
 
-        private void setWallpaper()
+        private void setWallpaper(object sender, DoWorkEventArgs e)
         {
             Random rand = new Random();
-            int num, num2 = 0;
-            while(true)
+            int num = 0, num2 = -1;
+
+            while (true)
             {
-                num = rand.Next(this.files.Count);
-
-                while (num == num2)
+                if (bw.CancellationPending)
                 {
-                    num = rand.Next(files.Count);
+                    e.Cancel = true;
+                    break;
                 }
+                else
+                {
+                    num = rand.Next(this.files.Count);
 
-                String file = files[num];
-                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, file, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-                System.Threading.Thread.Sleep(5000);
-                num2 = num;
+                    while (num == num2)
+                    {
+                        num = rand.Next(files.Count);
+                    }
+                    num2 = num;
+                    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, this.files[num], SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+                    System.Threading.Thread.Sleep(time_interval);
+                    
+                }
             }
             
         }
-    
-        private void stopWall(object sender, EventArgs e)
-        {
-            stopWallpaper();
-        }
 
-        private void stopWallpaper()
+        private void bw_stopWallpaper(object sender, EventArgs e)
         {
-            othread.Abort();
+            bw.CancelAsync();
             trayMenu.MenuItems[1].Enabled = true;
             trayMenu.MenuItems[2].Enabled = false;
         }

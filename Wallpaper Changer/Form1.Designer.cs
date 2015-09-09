@@ -52,7 +52,7 @@
             this.start_tray.TabIndex = 0;
             this.start_tray.Text = "Start Tray";
             this.start_tray.UseVisualStyleBackColor = true;
-            this.start_tray.Click += new System.EventHandler(this.button1_Click);
+            this.start_tray.Click += new System.EventHandler(this.start_tray_Click);
             // 
             // posible_items
             // 
@@ -113,6 +113,7 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.InitialDirectory = "C:\\Apps\\Wallpaper Changer\\Files";
             // 
             // save_file
             // 

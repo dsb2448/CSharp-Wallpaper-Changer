@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.IO;
 using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Wallpaper_Changer
 {   
-     
-
     public class SysTrayApp : Form
     {
         // Import the user32.dll to allow the SystemParametersInfo function to change the desktop wallpaper
@@ -26,7 +19,7 @@ namespace Wallpaper_Changer
         const int SPIF_SENDWININICHANGE = 0x02;
 
         /*
-         * files: List of files to select from when changing the wallpaper.
+         * setting_items: List of setting_items to select from when changing the wallpaper.
          * trayIcon: The image to use on the system tray.
          * trayMenu: Creates a system tray menu.
          */
@@ -42,7 +35,7 @@ namespace Wallpaper_Changer
         /// <summary>
         /// Constructor that creates the system tray icon and menu.
         /// </summary>
-        /// <param name="file">List of strings that contains the files to use when changing the wallpaper</param>
+        /// <param name="file">List of strings that contains the setting_items to use when changing the wallpaper</param>
 
         public SysTrayApp(List<String> file, decimal time)
         {
@@ -118,10 +111,8 @@ namespace Wallpaper_Changer
                     num2 = num;
                     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, this.files[num], SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
                     System.Threading.Thread.Sleep(time_interval);
-                    
                 }
             }
-            
         }
 
         private void bw_stopWallpaper(object sender, EventArgs e)

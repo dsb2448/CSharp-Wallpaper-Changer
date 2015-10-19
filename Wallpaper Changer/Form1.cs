@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -7,19 +8,23 @@ namespace Wallpaper_Changer
 {
     public partial class Form1 : Form
     {
-        public String file_location;
-        public List<String> file_list = new List<string>();
+        // Accessed in Image_Button class
+        public static Control selected_control = null;
+
+
+        public List<String> file_list = new List<String>();
         private Settings __settings = new Settings();
 
+        
         public Form1()
-        {
-
+        {// START Form1
+            // AUTO GENERATED
             InitializeComponent();
 
-            file_location = __settings.fileLocation;
+            // Location of .wall file to use
+            String file_location = __settings.fileLocation;
 
             String list;
-
             
             using (StreamReader stream = new StreamReader(file_location))
             {
@@ -29,26 +34,21 @@ namespace Wallpaper_Changer
                 }
             }
 
-            
-            for (int i = 0; i < file_list.Count; i++)
-            {
-                list = file_list[i];
-                items_to_use.Items.Add(list);
-            }
+            Image_Button[] pic_button = new Image_Button[file_list.Count];
 
-            if (items_to_use.Items.Count == 0)
+            for (int i = 0; i < pic_button.Length; i++)
             {
-                move_left.Enabled = false;
+                pic_button[i] = new Image_Button();
+                pic_button[i].setParemeters(file_list[i]);
+                possible_pics_panel.Controls.Add(pic_button[i]);
             }
+        } // END Form1
 
-            if (posible_items.Items.Count == 0)
-            {
-                move_right.Enabled = false;
-            }
-        }
+        
 
-        private void start_tray_Click(object sender, EventArgs e)
-        {
+        
+        private void startTrayClick(object sender, EventArgs e)
+        {// START startTrayClick
             List<String> files = new List<string>();
 
             foreach (String i in items_to_use.Items)
@@ -58,10 +58,16 @@ namespace Wallpaper_Changer
 
             SysTrayApp tray = new SysTrayApp(files, time_select.Value);
             this.Hide();
-        }
+        }// END startTrayClick
 
-        private void move_right_Click(object sender, EventArgs e)
-        {
+
+
+        
+        /* 
+         * Moves the selected file from the possible_pics_panel to the pics_to_use_panel
+         * */
+        private void moveRightClick(object sender, EventArgs e)
+        {// START moveRightClick
             if (posible_items.SelectedItem != null)
             {
                 items_to_use.Items.Add(posible_items.SelectedItem);
@@ -77,39 +83,29 @@ namespace Wallpaper_Changer
             {
                 move_left.Enabled = true;
             }
-        }
+        }// END moveRightClick
 
-        private void move_left_Click(object sender, EventArgs e)
-        {
-            if (items_to_use.SelectedItem != null)
+
+        
+        
+        /*
+         * Moves the selected file from the pics_to_use_panel to the possible_pics_panel
+         * */
+        private void moveLeftClick(object sender, EventArgs e)
+        {// START moveLeftClick
+            // If a button is selected from the possible_pics_panel remove it.
+            if (selected_control != null && selected_control.Parent.Name == "possible_pics_panel")
             {
-                posible_items.Items.Add(items_to_use.SelectedItem);
-                items_to_use.Items.Remove(items_to_use.SelectedItem);
+                pics_to_use_panel.Controls.Add(selected_control);
+                possible_pics_panel.Controls.Remove(selected_control);
             }
+        }// END moveLeftClick
 
-            if (items_to_use.Items.Count == 0)
-            {
-                move_left.Enabled = false;
-            }
 
-            if (posible_items.Items.Count > 0)
-            {
-                move_right.Enabled = true;
-            }
 
-        }
-
-        private void posible_items_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (posible_items.SelectedItem != null)
-            {
-                pictureBox1.ImageLocation = posible_items.SelectedItem.ToString();
-            }
-
-        }
-
-        private void load_file_Click(object sender, EventArgs e)
-        {
+        
+        private void loadFileClick(object sender, EventArgs e)
+        {// START loadFileClick
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 Stream file = openFileDialog1.OpenFile();
@@ -139,14 +135,25 @@ namespace Wallpaper_Changer
             {
                 move_right.Enabled = true;
             }
-        }
+        }// END loadFileClick
 
-        private void save_file_Click(object sender, EventArgs e)
-        {
+
+
+        
+        private void saveFileClick(object sender, EventArgs e)
+        {// START saveFileClick
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 // TODO - Add code to save current file list.
             }
-        }
+        }// END saveFileClick
+
+
+
+        
+        public static Image resizeImage(Image imgToResize, Size size)
+        {// START resizeImage
+            return (Image)(new Bitmap(imgToResize, size));
+        }// END resizeImage
     }
 }

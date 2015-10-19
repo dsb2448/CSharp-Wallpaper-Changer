@@ -9,13 +9,13 @@ namespace Wallpaper_Changer
     {
         // Variables
         
-        private const string SETTING_FILE_PATH = @"C:\Apps\Wallpaper Changer\Settings.txt";
+        private static string SETTING_FILE_PATH = @"C:\Users\" + Environment.UserName +@"\Wallpaper Changer\Settings.txt";
+        private static string SETTING_FOLDER_PATH = @"C:\Users\" + Environment.UserName + @"\Wallpaper Changer\";
         private List<string> setting_options = new List<string>();
 
         private String file_location;
 
         // End of Variables
-
         public String fileLocation
         {
             get { return file_location; }
@@ -86,17 +86,17 @@ namespace Wallpaper_Changer
         /// </summary>
         private void createFileStructure()
         {
-            // See if the directory "C:\Apps" exists and if not create it.
-            if (!Directory.Exists(@"C:\Apps"))
-            { Directory.CreateDirectory(@"C:\Apps"); }
+        //    // See if the directory "C:\Apps" exists and if not create it.
+        //    if (!Directory.Exists(@"C:\Apps"))
+        //    { Directory.CreateDirectory(@"C:\Apps"); }
 
-            // See if the directory "C:\Apps\Wallpaper Changer" exists and if not create it.
-            if (!Directory.Exists(@"C:\Apps\Wallpaper Changer"))
-            { Directory.CreateDirectory(@"C:\Apps\Wallpaper Changer"); }
+        //    // See if the directory "C:\Apps\Wallpaper Changer" exists and if not create it.
+        //    if (!Directory.Exists(@"C:\Apps\Wallpaper Changer"))
+        //    { Directory.CreateDirectory(@"C:\Apps\Wallpaper Changer"); }
 
             // See if the directory "C:\Apps\Wallpaper Changer\Playlist" exist and if not create it.
-            if (!Directory.Exists(@"C:\Apps\Wallpaper Changer\Playlist"))
-            { Directory.CreateDirectory(@"C:\Apps\Wallpaper Changer\Playlist"); }
+            if (!Directory.Exists(SETTING_FOLDER_PATH + "Playlist"))
+            { Directory.CreateDirectory(SETTING_FOLDER_PATH + "Playlist"); }
 
             // See if the file "C:\Apps\Wallpaper Changer\Settings.txt" exist and if not create it.
             if (!File.Exists(SETTING_FILE_PATH))
@@ -105,14 +105,13 @@ namespace Wallpaper_Changer
                 my_file.Close(); ;
             }
 
-            if (!File.Exists(@"C:\Apps\Wallpaper Changer\Playlist\Sample.wall"))
+            if (!File.Exists(SETTING_FOLDER_PATH + @"Playlist\Sample.wall"))
             {
-                var my_file = File.Create(@"C:\Apps\Wallpaper Changer\Playlist\Sample.wall");
-                my_file.Close();
+                File.Create(SETTING_FOLDER_PATH + @"Playlist\Sample.wall").Dispose();
 
-                using (StreamWriter stream_w = new StreamWriter(@"C:\Apps\Wallpaper Changer\Playlist\Sample.wall"))
+                using (StreamWriter stream_w = new StreamWriter(SETTING_FOLDER_PATH + @"Playlist\Sample.wall"))
                 {
-                    String[] files = Directory.GetFiles(@"C:\Users\Scott\Pictures", "*.jpg");
+                    String[] files = Directory.GetFiles(@"C:\Users\" + Environment.UserName + @"\Pictures", "*.jpg");
                     foreach (string file in files)
                     { stream_w.WriteLine(file); }
                 }

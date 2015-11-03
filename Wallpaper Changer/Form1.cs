@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -8,152 +7,132 @@ namespace Wallpaper_Changer
 {
     public partial class Form1 : Form
     {
-        // Accessed in Image_Button class
+        /// <summary>
+        /// The current selected image in one of the panels
+        /// </summary>
         public static Control selected_control = null;
 
-
-        public List<String> file_list = new List<String>();
+        public List<Control> file_list = new List<Control>();
         private Settings __settings = new Settings();
 
-        
         public Form1()
-        {// START Form1
+        {
             // AUTO GENERATED
             InitializeComponent();
 
-            // Location of .wall file to use
-            String file_location = __settings.fileLocation;
+            populatePanel(possible_pics_panel ,__settings.file_location);
+        }
 
-            String list;
-            
-            using (StreamReader stream = new StreamReader(file_location))
-            {
-                while((list = stream.ReadLine()) != null)
-                {
-                    file_list.Add(list);
-                }
-            }
+        /// <summary>
+        /// Takes the file path specified and adds all pictures to the specified FlowLayoutPanel.
+        /// </summary>
+        /// <param name="panel">The FlowLayoutPanel to add the items to</param>
+        /// <param name="file_to_use">The file that contains the image path to the pictures you want to use</param>
+        private void populatePanel(FlowLayoutPanel panel, String file_to_use)
+        {
+            panel.Controls.Clear();
 
-            Image_Button[] pic_button = new Image_Button[file_list.Count];
+            String[] pic_button_path = System.IO.File.ReadAllLines(file_to_use);
+            Image_Button[] pic_button = new Image_Button[pic_button_path.Length];
 
             for (int i = 0; i < pic_button.Length; i++)
             {
-                pic_button[i] = new Image_Button();
-                pic_button[i].setParemeters(file_list[i]);
+                pic_button[i] = new Image_Button(pic_button_path[i]);
+                Control current = pic_button[i];
+                pic_button[i].Click += (s, e) => { selected_control = current; };
+                panel.Controls.Add(pic_button[i]);
+            }
+        }
+
+        private void populatePanel(String[] files)
+        {
+            possible_pics_panel.Controls.Clear();
+
+            String file_location = __settings.file_location;
+            String[] pic_button_path = files;
+            Image_Button[] pic_button = new Image_Button[pic_button_path.Length];
+
+            for (int i = 0; i < pic_button.Length; i++)
+            {
+                pic_button[i] = new Image_Button(pic_button_path[i]);
+                Control current = pic_button[i];
+                pic_button[i].Click += (s, e) => { selected_control = current; };
                 possible_pics_panel.Controls.Add(pic_button[i]);
             }
-        } // END Form1
+        }
 
-        
-
-        
         private void startTrayClick(object sender, EventArgs e)
-        {// START startTrayClick
+        {
             List<String> files = new List<string>();
 
-            foreach (String i in items_to_use.Items)
+            foreach (Image_Button con in file_list)
             {
-                files.Add(i);
+                files.Add(con.image_location);
             }
 
             SysTrayApp tray = new SysTrayApp(files, time_select.Value);
             this.Hide();
-        }// END startTrayClick
-
-
-
+        }
         
         /* 
          * Moves the selected file from the possible_pics_panel to the pics_to_use_panel
          * */
         private void moveRightClick(object sender, EventArgs e)
-        {// START moveRightClick
-            if (posible_items.SelectedItem != null)
-            {
-                items_to_use.Items.Add(posible_items.SelectedItem);
-                posible_items.Items.Remove(posible_items.SelectedItem);
-            }
-
-            if (posible_items.Items.Count == 0)
-            {
-                move_right.Enabled = false;
-            }
-
-            if (items_to_use.Items.Count > 0)
-            {
-                move_left.Enabled = true;
-            }
-        }// END moveRightClick
-
-
-        
-        
-        /*
-         * Moves the selected file from the pics_to_use_panel to the possible_pics_panel
-         * */
-        private void moveLeftClick(object sender, EventArgs e)
-        {// START moveLeftClick
-            // If a button is selected from the possible_pics_panel remove it.
+        {
+            // If a image is selected from the possible_pics_panel remove it.
             if (selected_control != null && selected_control.Parent.Name == "possible_pics_panel")
             {
                 pics_to_use_panel.Controls.Add(selected_control);
                 possible_pics_panel.Controls.Remove(selected_control);
+                file_list.Add(selected_control);
             }
-        }// END moveLeftClick
+        }
 
+        /// <summary>
+        /// Moves the selected file from the pics_to_use_panel to the possible_pics_panel
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">EventArgs</param>
+        private void moveLeftClick(object sender, EventArgs e)
+        {
+            // If a image is selected from the pics_to_use_panel remove it.
+            if (selected_control != null && selected_control.Parent.Name == "pics_to_use_panel")
+            {
+                possible_pics_panel.Controls.Add(selected_control);
+                pics_to_use_panel.Controls.Remove(selected_control);
+                file_list.Remove(selected_control);
+            }
+        }
 
-
-        
         private void loadFileClick(object sender, EventArgs e)
-        {// START loadFileClick
+        {
+            openFileDialog1.InitialDirectory = @"C:\Users\" + Environment.UserName + @"\Wallpaper Changer\Playlist";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                Stream file = openFileDialog1.OpenFile();
+                pics_to_use_panel.Controls.Clear();
 
-                __settings.fileLocation = openFileDialog1.FileName;
-
-                file_list.Clear();
-
-                using (StreamReader file_stream = new StreamReader(file))
-                {
-                    string line;
-                    while ((line = file_stream.ReadLine()) != null)
-                    {
-                        file_list.Add(line);
-                    }
-                }
+                populatePanel(pics_to_use_panel, openFileDialog1.FileName);
+                 
             }
+        }
 
-            posible_items.Items.Clear();
-
-            for (int i = 0; i < file_list.Count; i++)
-            {
-                posible_items.Items.Add(file_list[i]);
-            }
-
-            if (posible_items.Items.Count > 0)
-            {
-                move_right.Enabled = true;
-            }
-        }// END loadFileClick
-
-
-
-        
         private void saveFileClick(object sender, EventArgs e)
-        {// START saveFileClick
+        {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 // TODO - Add code to save current file list.
             }
-        }// END saveFileClick
+        }
 
-
-
+        private void change_dir_button_Click(object sender, EventArgs e)
+        {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                __settings.file_location = folderBrowserDialog1.SelectedPath;
+                populatePanel(Directory.GetFiles(folderBrowserDialog1.SelectedPath, "*.jpg", SearchOption.TopDirectoryOnly));
+                
+            }
+        }
         
-        public static Image resizeImage(Image imgToResize, Size size)
-        {// START resizeImage
-            return (Image)(new Bitmap(imgToResize, size));
-        }// END resizeImage
     }
 }

@@ -29,19 +29,19 @@
         private void InitializeComponent()
         {
             this.start_tray = new System.Windows.Forms.Button();
-            this.items_to_use = new System.Windows.Forms.ListBox();
             this.move_right = new System.Windows.Forms.Button();
             this.move_left = new System.Windows.Forms.Button();
             this.load_file = new System.Windows.Forms.Button();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.save_file = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.time_select = new System.Windows.Forms.NumericUpDown();
             this.possible_pics_panel = new System.Windows.Forms.FlowLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
-            this.posible_items = new System.Windows.Forms.ListBox();
             this.pics_to_use_panel = new System.Windows.Forms.FlowLayoutPanel();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.change_dir_button = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.time_select)).BeginInit();
             this.SuspendLayout();
             // 
@@ -55,19 +55,11 @@
             this.start_tray.UseVisualStyleBackColor = true;
             this.start_tray.Click += new System.EventHandler(this.startTrayClick);
             // 
-            // items_to_use
-            // 
-            this.items_to_use.FormattingEnabled = true;
-            this.items_to_use.Location = new System.Drawing.Point(466, 51);
-            this.items_to_use.Name = "items_to_use";
-            this.items_to_use.Size = new System.Drawing.Size(333, 537);
-            this.items_to_use.TabIndex = 2;
-            // 
             // move_right
             // 
-            this.move_right.Location = new System.Drawing.Point(353, 13);
+            this.move_right.Location = new System.Drawing.Point(353, 29);
             this.move_right.Name = "move_right";
-            this.move_right.Size = new System.Drawing.Size(106, 137);
+            this.move_right.Size = new System.Drawing.Size(106, 121);
             this.move_right.TabIndex = 3;
             this.move_right.Text = "Move Right\r\n-->";
             this.move_right.UseVisualStyleBackColor = true;
@@ -93,11 +85,6 @@
             this.load_file.UseVisualStyleBackColor = true;
             this.load_file.Click += new System.EventHandler(this.loadFileClick);
             // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.InitialDirectory = "C:\\Apps\\Wallpaper Changer\\Files";
-            // 
             // save_file
             // 
             this.save_file.Location = new System.Drawing.Point(353, 368);
@@ -111,6 +98,7 @@
             // saveFileDialog1
             // 
             this.saveFileDialog1.DefaultExt = "wall";
+            this.saveFileDialog1.Filter = "Wall File|*.wall";
             this.saveFileDialog1.Title = "Save Wallpaper Playlist";
             // 
             // label1
@@ -124,10 +112,14 @@
             // 
             // time_select
             // 
-            this.time_select.DecimalPlaces = 1;
             this.time_select.Location = new System.Drawing.Point(353, 451);
             this.time_select.Maximum = new decimal(new int[] {
             1000,
+            0,
+            0,
+            0});
+            this.time_select.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
@@ -146,7 +138,7 @@
             this.possible_pics_panel.BackColor = System.Drawing.SystemColors.Window;
             this.possible_pics_panel.Location = new System.Drawing.Point(12, 29);
             this.possible_pics_panel.Name = "possible_pics_panel";
-            this.possible_pics_panel.Size = new System.Drawing.Size(333, 213);
+            this.possible_pics_panel.Size = new System.Drawing.Size(333, 516);
             this.possible_pics_panel.TabIndex = 10;
             // 
             // label2
@@ -158,30 +150,42 @@
             this.label2.TabIndex = 11;
             this.label2.Text = "Pics";
             // 
-            // posible_items
-            // 
-            this.posible_items.FormattingEnabled = true;
-            this.posible_items.Location = new System.Drawing.Point(587, -50);
-            this.posible_items.Name = "posible_items";
-            this.posible_items.Size = new System.Drawing.Size(120, 95);
-            this.posible_items.TabIndex = 12;
-            // 
             // pics_to_use_panel
             // 
             this.pics_to_use_panel.AutoScroll = true;
             this.pics_to_use_panel.BackColor = System.Drawing.SystemColors.Window;
-            this.pics_to_use_panel.Location = new System.Drawing.Point(12, 258);
+            this.pics_to_use_panel.Location = new System.Drawing.Point(466, 29);
             this.pics_to_use_panel.Name = "pics_to_use_panel";
-            this.pics_to_use_panel.Size = new System.Drawing.Size(333, 287);
+            this.pics_to_use_panel.Size = new System.Drawing.Size(333, 516);
             this.pics_to_use_panel.TabIndex = 11;
+            // 
+            // folderBrowserDialog1
+            // 
+            this.folderBrowserDialog1.Description = "Select the folder to get pictures from.";
+            this.folderBrowserDialog1.ShowNewFolderButton = false;
+            // 
+            // change_dir_button
+            // 
+            this.change_dir_button.Location = new System.Drawing.Point(46, 3);
+            this.change_dir_button.Name = "change_dir_button";
+            this.change_dir_button.Size = new System.Drawing.Size(299, 23);
+            this.change_dir_button.TabIndex = 13;
+            this.change_dir_button.Text = "Change Dir";
+            this.change_dir_button.UseVisualStyleBackColor = true;
+            this.change_dir_button.Click += new System.EventHandler(this.change_dir_button_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "Wall File|*.wall";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(811, 557);
+            this.Controls.Add(this.change_dir_button);
             this.Controls.Add(this.pics_to_use_panel);
-            this.Controls.Add(this.posible_items);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.possible_pics_panel);
             this.Controls.Add(this.time_select);
@@ -190,7 +194,6 @@
             this.Controls.Add(this.load_file);
             this.Controls.Add(this.move_left);
             this.Controls.Add(this.move_right);
-            this.Controls.Add(this.items_to_use);
             this.Controls.Add(this.start_tray);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -203,19 +206,19 @@
         #endregion
 
         private System.Windows.Forms.Button start_tray;
-        private System.Windows.Forms.ListBox items_to_use;
         private System.Windows.Forms.Button move_right;
         private System.Windows.Forms.Button move_left;
         private System.Windows.Forms.Button load_file;
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button save_file;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown time_select;
         private System.Windows.Forms.FlowLayoutPanel possible_pics_panel;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ListBox posible_items;
         private System.Windows.Forms.FlowLayoutPanel pics_to_use_panel;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.Button change_dir_button;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

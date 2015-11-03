@@ -8,76 +8,26 @@ namespace Wallpaper_Changer
     class Settings
     {
         // Variables
+
+        // Path to the settings file
+        private static string SETTING_FILE_PATH = @"C:\Users\" + Environment.UserName + @"\Wallpaper Changer\Settings.txt";
+
+        // Path to the programs folder
+        private static string FOLDER_PATH = @"C:\Users\" + Environment.UserName + @"\Wallpaper Changer\";
         
-        private static string SETTING_FILE_PATH = @"C:\Users\" + Environment.UserName +@"\Wallpaper Changer\Settings.txt";
-        private static string SETTING_FOLDER_PATH = @"C:\Users\" + Environment.UserName + @"\Wallpaper Changer\";
+        // List to store the data from the settings file
         private List<string> setting_options = new List<string>();
 
-        private String file_location;
-
-        // End of Variables
-        public String fileLocation
-        {
-            get { return file_location; }
-            set { 
-                    file_location = value;
-                    
-                    using (StreamWriter stream = new StreamWriter(SETTING_FILE_PATH))
-                    {
-                        stream.WriteLine(file_location);
-                    }
-                }
-        }
+        public String file_location {get; set;}
 
         /// <summary>
         /// Constructor used to check if file path is created.
         /// </summary>
         public Settings()
-        {
-            createDataInFile();
-        }
-
-        /// <summary>
-        /// if Data exist in the settings file retrieve it.
-        /// </summary>
-        public String getDataFromFile()
-        {
-            return fileLocation;
-            // TODO: if data is in the settings file retrieve it, if not create it.
-        }
-
-        /// <summary>
-        /// If no data in file create a sample file and retrieve it.
-        /// </summary>
-        private void createDataInFile()
-        {
-            while (true)
-            {
-                try
-                {
-                    using (StreamReader stream_r = new StreamReader(SETTING_FILE_PATH))
-                    {
-                        string line;
-                        while ((line = stream_r.ReadLine()) != null)
-                        { setting_options.Add(line); }
-                    }
-                    
-                    if (setting_options.Count < 1)
-                    {
-                        using (StreamWriter stream_w = new StreamWriter(SETTING_FILE_PATH))
-                        { stream_w.WriteLine(@"C:\Apps\Wallpaper Changer\Playlist\Sample.wall"); }
-                        continue;
-                    }
-                    break;
-
-                }
-                catch (DirectoryNotFoundException)
-                { createFileStructure(); }
-                catch (FileNotFoundException)
-                { createFileStructure(); }
-            }
-
-            fileLocation = setting_options[0];
+        {   
+            createFileStructure();
+            createDataInSampleFile();
+            getDataFromFile();
         }
 
         /// <summary>
@@ -86,36 +36,76 @@ namespace Wallpaper_Changer
         /// </summary>
         private void createFileStructure()
         {
-        //    // See if the directory "C:\Apps" exists and if not create it.
-        //    if (!Directory.Exists(@"C:\Apps"))
-        //    { Directory.CreateDirectory(@"C:\Apps"); }
+            if (!Directory.Exists(FOLDER_PATH))
+            {
+                Directory.CreateDirectory(FOLDER_PATH);
+                Directory.CreateDirectory(FOLDER_PATH + "Playlist");
+            }
+            else if (!Directory.Exists(FOLDER_PATH + "Playlist"))
+            {
+                Directory.CreateDirectory(FOLDER_PATH + "Playlist");
+            }
 
-        //    // See if the directory "C:\Apps\Wallpaper Changer" exists and if not create it.
-        //    if (!Directory.Exists(@"C:\Apps\Wallpaper Changer"))
-        //    { Directory.CreateDirectory(@"C:\Apps\Wallpaper Changer"); }
-
-            // See if the directory "C:\Apps\Wallpaper Changer\Playlist" exist and if not create it.
-            if (!Directory.Exists(SETTING_FOLDER_PATH + "Playlist"))
-            { Directory.CreateDirectory(SETTING_FOLDER_PATH + "Playlist"); }
-
-            // See if the file "C:\Apps\Wallpaper Changer\Settings.txt" exist and if not create it.
+            // See if the file Settings.txt exist and if not create it.
             if (!File.Exists(SETTING_FILE_PATH))
             {
-                var my_file = File.Create(SETTING_FILE_PATH);
-                my_file.Close(); ;
+                File.Create(SETTING_FILE_PATH).Dispose();
+                setCurrentPlaylist(@"Playlist\Sample.wall");
             }
 
-            if (!File.Exists(SETTING_FOLDER_PATH + @"Playlist\Sample.wall"))
+            if (File.Exists(FOLDER_PATH + @"Playlist\Sample.wall"))
             {
-                File.Create(SETTING_FOLDER_PATH + @"Playlist\Sample.wall").Dispose();
+                File.Delete(FOLDER_PATH + @"Playlist\Sample.wall");
+            }
 
-                using (StreamWriter stream_w = new StreamWriter(SETTING_FOLDER_PATH + @"Playlist\Sample.wall"))
+            File.Create(FOLDER_PATH + @"Playlist\Sample.wall").Dispose();
+        }// End of function createFileStructure()
+
+        /// <summary>
+        /// create a sample file and and populate it
+        /// </summary>
+        /// <remarks>
+        /// This method checks to see if the sample.wall file exist 
+        /// and if not create it and populate it with sample images.
+        /// </remarks>
+        private void createDataInSampleFile()
+        {
+            try
+            {
+                using (StreamWriter temp_stream_writer = new StreamWriter(FOLDER_PATH + @"Playlist\Sample.wall"))
                 {
-                    String[] files = Directory.GetFiles(@"C:\Users\" + Environment.UserName + @"\Pictures", "*.jpg");
-                    foreach (string file in files)
-                    { stream_w.WriteLine(file); }
+                    const string WINDOWS_IMAGES_FOLDER = @"C:\Windows\Web\Wallpaper\Theme1\";
+                    for (int i = 1; i < 5; i++)
+                    {
+                        temp_stream_writer.WriteLine(WINDOWS_IMAGES_FOLDER + "img" + i + ".jpg");
+                    }
                 }
             }
-        }// End of function createFileStructure()
+            catch (Exception)
+            {
+                
+            }
+        }
+
+        /// <summary>
+        /// if Data exist in the settings file retrieve it.
+        /// </summary>
+        public String getDataFromFile()
+        {
+            using (StreamReader temp_stream_reader = new StreamReader(SETTING_FILE_PATH))
+            {
+                file_location = temp_stream_reader.ReadLine();
+            }
+
+            return file_location;
+        }
+
+        public void setCurrentPlaylist(String new_file_location)
+        {
+            using (StreamWriter temp_stream_write = new StreamWriter(SETTING_FILE_PATH))
+            {
+                temp_stream_write.WriteLine(FOLDER_PATH + new_file_location);
+            }
+        }
     }// End of class Settings
 }// End of namespace Wallpaper_Changer
